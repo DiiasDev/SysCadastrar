@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SysCadastro</title>
+    <title>Cadastrar Usuário - SysCadastro</title>
     <link rel="stylesheet" href="/SysCadastro/styles/styles.css">
     <link rel="stylesheet" href="/SysCadastro/styles/theme.css">
+    <!-- Removido o <style> interno dos modais -->
 </head>
 
 <body>
@@ -15,8 +16,8 @@
             <img src="https://img.icons8.com/fluency/96/000000/user-group-man-man.png" alt="SysCadastro Logo"
                 class="logo">
             <h1>SysCadastro</h1>
-            <p>Gerencie seus usuários com facilidade, segurança e rapidez.<br>
-                <span class="highlight">Cadastre, edite e visualize informações em poucos cliques!</span>
+            <p>Crie sua conta e comece a gerenciar usuários agora mesmo!<br>
+                <span class="highlight">É rápido, seguro e fácil.</span>
             </p>
             <ul class="features">
                 <li>🔒 Segurança de dados</li>
@@ -26,35 +27,31 @@
         </div>
         <div class="content">
             <div class="contentTitle">
-                <h2>Bem-Vindo ao SysCadastro</h2>
-                <p>Seu sistema de cadastros de usuários moderno e prático</p>
+                <h2>Criar Conta</h2>
+                <p>Preencha os campos para cadastrar um novo usuário</p>
             </div>
             <div class="contentForm">
-                <form action="" id="formLogin">
-                    <label for="emailLogin">Email</label>
-                    <input type="text" id="emailLogin" placeholder="Digite seu email">
+                <form id="formCadastro">
+                    <label for="nome">Nome</label>
+                    <input type="text" id="name" placeholder="Digite seu nome" required>
 
-                    <label for="passwordLogin">Senha</label>
-                    <input type="password" id="passwordLogin" placeholder="Digite sua senha">
+                    <label for="emailCadastro">Email</label>
+                    <input type="text" id="emailCadastro" placeholder="Digite seu email" required>
+
+                    <label for="passwordCadastro">Senha</label>
+                    <input type="password" id="passwordCadastro" placeholder="Digite sua senha" required>
 
                     <div class="formActions">
-                        <button id="entrar" type="submit">Entrar</button>
-                        <button id="cadastrar" type="button"
-                            onclick="window.location.href='/SysCadastro/pages/createUser.html'">Cadastrar</button>
+                        <button id="create" type="submit">Cadastrar</button>
+                        <button type="button" onclick="window.location.href='/SysCadastro/index.html'">Voltar</button>
                     </div>
                     <div class="extraLinks">
-                        <a href="#" class="forgot">Esqueceu a senha?</a>
-                        <a href="#" class="help">Precisa de ajuda?</a>
+                        <a href="/SysCadastro/index.html">Já tem conta? Entrar</a>
                     </div>
-
                 </form>
             </div>
         </div>
     </div>
-    <footer>
-        <p>© 2024 SysCadastro. Todos os direitos reservados.</p>
-    </footer>
-    <script src="/SysCadastro/scripts/index.js"></script>
     <!-- Modais -->
     <div id="modal-loading" class="modal" style="display:none;">
         <div class="modal-content">
@@ -67,14 +64,18 @@
     </div>
     <div id="modal-success" class="modal" style="display:none;">
         <div class="modal-content success">
-            <span>Login realizado com sucesso!</span>
+            <span>Cadastro realizado com sucesso!</span>
         </div>
     </div>
     <div id="modal-error" class="modal" style="display:none;">
         <div class="modal-content error">
-            <span>Ocorreu um erro ao logar. Tente novamente.</span>
+            <span>Ocorreu um erro ao cadastrar. Tente novamente.</span>
         </div>
     </div>
+    <footer>
+        <p>© 2024 SysCadastro. Todos os direitos reservados.</p>
+    </footer>
+    <script src="/SysCadastro/scripts/index.js"></script>
 </body>
 
 </html>
