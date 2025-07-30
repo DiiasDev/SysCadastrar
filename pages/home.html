@@ -9,14 +9,27 @@
 </head>
 
 <body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="/SysCadastro/assets/logo.png" alt="Logo DSYS" class="sidebar-logo">
+            <div>
+                <div class="sidebar-company">DSYS</div>
+                <div class="sidebar-user">Usuário</div>
+            </div>
+        </div>
+        <nav class="sidebar-menu">
+            <a href="#" class="sidebar-tab active" data-tab="pecas">Peças</a>
+            <a href="#" class="sidebar-tab" data-tab="carros">Carros</a>
+            <a href="#" class="sidebar-tab" data-tab="orcamentos">Orçamentos</a>
+        </nav>
+        <div class="sidebar-footer">
+            &copy; 2024 DSYS
+        </div>
+    </div>
     <div class="app-container">
-        <!-- Header -->
-        <div id="header"></div>
 
-        <!-- Main Content -->
         <main>
             <div id="welcome-header"></div>
-            <div id="tabs"></div>
             <section id="tab-pecas" class="tab-content active"></section>
             <section id="tab-carros" class="tab-content"></section>
             <section id="tab-orcamentos" class="tab-content"></section>
@@ -24,31 +37,56 @@
     </div>
 
     <div id="modal-crud"></div>
+    <div id="modal-home" class="modal">
+        <div class="modal-content home-modal">
+            <button class="close-modal" aria-label="Fechar"
+                onclick="document.getElementById('modal-home').classList.remove('show')">&times;</button>
+            <h2>Bem-vindo!</h2>
+            <div class="modal-body">
+                Este é um exemplo de modal estilizado para a página Home.
+            </div>
+            <div class="modal-actions">
+                <button class="btn primary"
+                    onclick="document.getElementById('modal-home').classList.remove('show')">OK</button>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer">
         &copy; 2024 DSYS. Todos os direitos reservados.
     </footer>
     <script>
-        // Carregar componentes HTML nos containers
         async function loadComponent(id, path) {
             const res = await fetch(path);
             const html = await res.text();
             document.getElementById(id).innerHTML = html;
         }
-        loadComponent('header', '../components/Header.html');
         loadComponent('welcome-header', '../components/WelcomeHeader.html');
-        // Carrega os tabs e inicializa os eventos após o carregamento
-        loadComponent('tabs', '../components/Tabs.html').then(async () => {
-            const tabsModule = await import('../scripts/tabs.js');
-            tabsModule.initTabs();
-        });
         loadComponent('tab-pecas', '../components/TablePecas.html');
         loadComponent('tab-carros', '../components/TableCarros.html');
         loadComponent('tab-orcamentos', '../components/TableOrcamentos.html');
-        // Carrega o modal e só então inicializa o script do modal
         loadComponent('modal-crud', '../components/ModalCRUD.html').then(async () => {
             const modalModule = await import('../scripts/modal.js');
             if (modalModule.initModal) modalModule.initModal();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.sidebar-tab');
+            const sections = {
+                pecas: document.getElementById('tab-pecas'),
+                carros: document.getElementById('tab-carros'),
+                orcamentos: document.getElementById('tab-orcamentos')
+            };
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    Object.values(sections).forEach(sec => sec.classList.remove('active'));
+                    const tabName = tab.getAttribute('data-tab');
+                    if (sections[tabName]) sections[tabName].classList.add('active');
+                });
+            });
         });
     </script>
 </body>

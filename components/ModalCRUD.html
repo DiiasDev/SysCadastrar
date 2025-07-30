@@ -2,58 +2,100 @@
     <div class="modal-content">
         <button class="close-modal" aria-label="Fechar">&times;</button>
         <form class="crud-form" id="form-pecas" style="display:none;">
-            <h2>Peça</h2>
-            <input type="text" placeholder="Nome da peça" required>
-            <input type="text" placeholder="Categoria">
-            <input type="number" placeholder="Estoque" min="0">
-            <input type="number" placeholder="Preço" min="0" step="0.01">
+            <h2>Cadastro de Peça</h2>
+            <div class="form-row">
+                <label>Nome da peça *</label>
+                <input type="text" required>
+            </div>
+            <div class="form-row">
+                <label>Categoria</label>
+                <input type="text">
+            </div>
+            <div class="form-row">
+                <label>Estoque</label>
+                <input type="number" min="0">
+            </div>
+            <div class="form-row">
+                <label>Preço</label>
+                <input type="number" min="0" step="0.01">
+            </div>
             <div class="form-actions">
                 <button type="submit" class="btn primary">Salvar</button>
+                <button type="button" class="btn" id="cancelPecaBtn">Cancelar</button>
             </div>
         </form>
         <form class="crud-form" id="form-carros" style="display:none;">
-            <h2>Carro</h2>
-            <input type="text" placeholder="Modelo" required>
-            <input type="text" placeholder="Marca" required>
-            <input type="number" placeholder="Ano" min="1900" max="2100">
-            <input type="text" placeholder="Placa" maxlength="10">
+            <h2>Cadastro de Carro</h2>
+            <div class="form-row">
+                <label>Modelo *</label>
+                <input type="text" required>
+            </div>
+            <div class="form-row">
+                <label>Marca *</label>
+                <input type="text" required>
+            </div>
+            <div class="form-row">
+                <label>Ano</label>
+                <input type="number" min="1900" max="2100">
+            </div>
+            <div class="form-row">
+                <label>Placa</label>
+                <input type="text" maxlength="10">
+            </div>
             <div class="form-actions">
                 <button type="submit" class="btn primary">Salvar</button>
+                <button type="button" class="btn" id="cancelCarroBtn">Cancelar</button>
             </div>
         </form>
         <form class="crud-form" id="form-orcamentos" style="display:none;">
-            <h2>Orçamento</h2>
-            <input type="text" placeholder="Cliente" required>
-            <input type="text" placeholder="Carro" required>
-            <input type="date" placeholder="Data">
-            <input type="text" placeholder="Status">
-            <div class="orcamento-pecas-group">
-                <label for="peca-select">Peça</label>
-                <select id="peca-select" class="peca-select">
+            <h2>Cadastro de Orçamento</h2>
+            <div class="form-row">
+                <label>Cliente *</label>
+                <input type="text" required>
+            </div>
+            <div class="form-row">
+                <label>Carro *</label>
+                <input type="text" required>
+            </div>
+            <div class="form-row">
+                <label>Data</label>
+                <input type="date">
+            </div>
+            <div class="form-row">
+                <label>Status</label>
+                <input type="text">
+            </div>
+            <div class="form-row">
+                <label>Peça</label>
+                <select>
                     <option value="">Selecione a peça</option>
-                    <option value="1" data-preco="25.00">Filtro de Óleo (R$ 25,00)</option>
-                    <option value="2" data-preco="70.00">Pastilha de Freio (R$ 70,00)</option>
-                    <!-- Adicione mais opções conforme necessário -->
+                    <option value="1">Filtro de Óleo</option>
+                    <option value="2">Pastilha de Freio</option>
                 </select>
-                <div class="orcamento-pecas-row">
-                    <input type="number" id="peca-quantidade" class="peca-quantidade" placeholder="Qtd." min="1"
-                        value="1" style="width:80px;">
-                    <input type="text" id="peca-valor" class="peca-valor" placeholder="Valor" readonly
-                        style="width:110px;">
-                </div>
             </div>
-            <div class="orcamento-mao-obra-group">
-                <label for="mao-obra-desc">Mão de Obra</label>
-                <input type="text" id="mao-obra-desc" class="mao-obra-desc" placeholder="Descrição da mão de obra">
-                <input type="number" id="mao-obra-valor" class="mao-obra-valor" placeholder="Valor da mão de obra"
-                    min="0" step="0.01">
+            <div class="form-row">
+                <label>Qtd.</label>
+                <input type="number" min="1" value="1">
             </div>
-            <div class="orcamento-total-group">
-                <label for="orcamento-total">Valor Total</label>
-                <input type="text" id="orcamento-total" class="orcamento-total" placeholder="Total" readonly>
+            <div class="form-row">
+                <label>Valor</label>
+                <input type="text" readonly>
+            </div>
+            <div class="form-row">
+                <label>Mão de Obra</label>
+                <input type="text">
+            </div>
+            <div class="form-row">
+                <label>Valor Mão de Obra</label>
+                <input type="number" min="0" step="0.01">
+            </div>
+            <div class="form-row">
+                <label>Total</label>
+                <input type="text" readonly>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn primary">Salvar</button>
+                <button type="button" class="btn" id="cancelOrcamentoBtn">Cancelar</button>
             </div>
         </form>
         <div class="crud-form" id="form-delete" style="display:none;">
