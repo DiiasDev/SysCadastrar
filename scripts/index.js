@@ -52,9 +52,11 @@ class users {
             form.addEventListener("submit", async (event) => {
                 event.preventDefault();
 
+                // 1. capturando valores digitados pelo usuário
                 const email = document.getElementById("emailLogin").value;
                 const password = document.getElementById("passwordLogin").value;
 
+                // 2. Fazendo consulta na API
                 try {
                     const response = await fetch("http://127.0.0.1:5000/usuarios", {
                         method: "GET",
@@ -69,11 +71,30 @@ class users {
                     const data = await response.json();
                     console.log("Usuários recebidos:", data);
 
+                    // 3. Buscando usuário na API
                     const user = data.find(u => u.email === email && u.password === password);
 
                     if (user) {
-                        console.log("Logando...");
+                        // Mostra modal de sucesso
+                        const modalSuccess = document.getElementById("modal-success");
+                        if (modalSuccess) {
+                            modalSuccess.style.display = "flex";
+                            setTimeout(() => {
+                                modalSuccess.style.display = "none";
+                                window.location.href = "/SysCadastro/pages/home.html";
+                            }, 1200);
+                        } else {
+                            window.location.href = "/SysCadastro/pages/home.html";
+                        }
                     } else {
+                        // Mostra modal de erro
+                        const modalError = document.getElementById("modal-error");
+                        if (modalError) {
+                            modalError.style.display = "flex";
+                            setTimeout(() => {
+                                modalError.style.display = "none";
+                            }, 1800);
+                        }
                         console.log("Usuário ou senha errado...");
                     }
                 } catch (e) {

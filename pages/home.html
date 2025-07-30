@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DSYS - Home</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="icon" href="../assets/logo.png">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div id="header"></div>
+
+        <!-- Main Content -->
+        <main>
+            <div id="welcome-header"></div>
+            <div id="tabs"></div>
+            <section id="tab-pecas" class="tab-content active"></section>
+            <section id="tab-carros" class="tab-content"></section>
+            <section id="tab-orcamentos" class="tab-content"></section>
+        </main>
+    </div>
+
+    <div id="modal-crud"></div>
+
+    <footer class="footer">
+        &copy; 2024 DSYS. Todos os direitos reservados.
+    </footer>
+    <script>
+        // Carregar componentes HTML nos containers
+        async function loadComponent(id, path) {
+            const res = await fetch(path);
+            const html = await res.text();
+            document.getElementById(id).innerHTML = html;
+        }
+        loadComponent('header', '../components/Header.html');
+        loadComponent('welcome-header', '../components/WelcomeHeader.html');
+        // Carrega os tabs e inicializa os eventos após o carregamento
+        loadComponent('tabs', '../components/Tabs.html').then(async () => {
+            const tabsModule = await import('../scripts/tabs.js');
+            tabsModule.initTabs();
+        });
+        loadComponent('tab-pecas', '../components/TablePecas.html');
+        loadComponent('tab-carros', '../components/TableCarros.html');
+        loadComponent('tab-orcamentos', '../components/TableOrcamentos.html');
+        // Carrega o modal e só então inicializa o script do modal
+        loadComponent('modal-crud', '../components/ModalCRUD.html').then(async () => {
+            const modalModule = await import('../scripts/modal.js');
+            if (modalModule.initModal) modalModule.initModal();
+        });
+    </script>
+</body>
+
+</html>

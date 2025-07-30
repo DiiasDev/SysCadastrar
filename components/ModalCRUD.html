@@ -1,0 +1,68 @@
+<div class="modal" id="crudModal" style="display:none;">
+    <div class="modal-content">
+        <button class="close-modal" aria-label="Fechar">&times;</button>
+        <form class="crud-form" id="form-pecas" style="display:none;">
+            <h2>Peça</h2>
+            <input type="text" placeholder="Nome da peça" required>
+            <input type="text" placeholder="Categoria">
+            <input type="number" placeholder="Estoque" min="0">
+            <input type="number" placeholder="Preço" min="0" step="0.01">
+            <div class="form-actions">
+                <button type="submit" class="btn primary">Salvar</button>
+            </div>
+        </form>
+        <form class="crud-form" id="form-carros" style="display:none;">
+            <h2>Carro</h2>
+            <input type="text" placeholder="Modelo" required>
+            <input type="text" placeholder="Marca" required>
+            <input type="number" placeholder="Ano" min="1900" max="2100">
+            <input type="text" placeholder="Placa" maxlength="10">
+            <div class="form-actions">
+                <button type="submit" class="btn primary">Salvar</button>
+            </div>
+        </form>
+        <form class="crud-form" id="form-orcamentos" style="display:none;">
+            <h2>Orçamento</h2>
+            <input type="text" placeholder="Cliente" required>
+            <input type="text" placeholder="Carro" required>
+            <input type="date" placeholder="Data">
+            <input type="text" placeholder="Status">
+            <div class="orcamento-pecas-group">
+                <label for="peca-select">Peça</label>
+                <select id="peca-select" class="peca-select">
+                    <option value="">Selecione a peça</option>
+                    <option value="1" data-preco="25.00">Filtro de Óleo (R$ 25,00)</option>
+                    <option value="2" data-preco="70.00">Pastilha de Freio (R$ 70,00)</option>
+                    <!-- Adicione mais opções conforme necessário -->
+                </select>
+                <div class="orcamento-pecas-row">
+                    <input type="number" id="peca-quantidade" class="peca-quantidade" placeholder="Qtd." min="1"
+                        value="1" style="width:80px;">
+                    <input type="text" id="peca-valor" class="peca-valor" placeholder="Valor" readonly
+                        style="width:110px;">
+                </div>
+            </div>
+            <div class="orcamento-mao-obra-group">
+                <label for="mao-obra-desc">Mão de Obra</label>
+                <input type="text" id="mao-obra-desc" class="mao-obra-desc" placeholder="Descrição da mão de obra">
+                <input type="number" id="mao-obra-valor" class="mao-obra-valor" placeholder="Valor da mão de obra"
+                    min="0" step="0.01">
+            </div>
+            <div class="orcamento-total-group">
+                <label for="orcamento-total">Valor Total</label>
+                <input type="text" id="orcamento-total" class="orcamento-total" placeholder="Total" readonly>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn primary">Salvar</button>
+            </div>
+        </form>
+        <div class="crud-form" id="form-delete" style="display:none;">
+            <h2>Confirmar Remoção</h2>
+            <p>Tem certeza que deseja remover este item?</p>
+            <div class="form-actions">
+                <button type="button" class="btn danger" id="confirmDeleteBtn">Remover</button>
+                <button type="button" class="btn" id="cancelDeleteBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
