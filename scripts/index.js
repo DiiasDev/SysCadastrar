@@ -69,10 +69,11 @@ class users {
                     }
 
                     const data = await response.json();
+                    console.log("Data: ", data)
                     console.log("Usuários recebidos:", data);
 
                     // 3. Buscando usuário na API
-                    const user = data.find(u => u.email === email && u.password === password);
+                    const user = data.usuarios.find(u => u.email === email && u.password === password);
 
                     if (user) {
                         // Mostra modal de sucesso
@@ -87,7 +88,6 @@ class users {
                             window.location.href = "/SysCadastro/pages/home.html";
                         }
                     } else {
-                        // Mostra modal de erro
                         const modalError = document.getElementById("modal-error");
                         if (modalError) {
                             modalError.style.display = "flex";
