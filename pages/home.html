@@ -3,91 +3,124 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>DSYS - Home</title>
-    <link rel="stylesheet" href="../styles/main.css">
-    <link rel="icon" href="../assets/logo.png">
+    <title>Home</title>
+    <link rel="stylesheet" href="/styles/home.css">
+    <style>
+    </style>
 </head>
 
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <img src="/SysCadastro/assets/logo.png" alt="Logo DSYS" class="sidebar-logo">
-            <div>
-                <div class="sidebar-company">DSYS</div>
-                <div class="sidebar-user">Usuário</div>
-            </div>
+    <nav class="sidebar">
+        <button id="tabPecasBtn" class="active" onclick="showTab('pecas')">Peças</button>
+        <button id="tabCarrosBtn" onclick="showTab('carros')">Carros</button>
+        <button id="tabOrcamentosBtn" onclick="showTab('orcamentos')">Orçamentos</button>
+        <button id="tabClientesBtn" onclick="showTab('clientes')">Clientes</button>
+    </nav>
+    <main class="main-content">
+        <div class="top-actions">
+            <button id="btnAbrirModalPeca" onclick="abrirModal('modalCadastroPeca')" style="display:inline-block;">Nova
+                Peça</button>
+            <button id="btnAbrirModalCarro" onclick="abrirModal('modalCadastroCarro')" style="display:none;">Novo
+                Carro</button>
+            <button id="btnAbrirModalOrcamento" onclick="abrirModal('modalCadastroOrcamento')"
+                style="display:none;">Novo Orçamento</button>
+            <button id="btnAbrirModalCliente" onclick="abrirModal('modalCadastroCliente')" style="display:none;">Novo
+                Cliente</button>
         </div>
-        <nav class="sidebar-menu">
-            <a href="#" class="sidebar-tab active" data-tab="pecas">Peças</a>
-            <a href="#" class="sidebar-tab" data-tab="carros">Carros</a>
-            <a href="#" class="sidebar-tab" data-tab="orcamentos">Orçamentos</a>
-        </nav>
-        <div class="sidebar-footer">
-            &copy; 2024 DSYS
-        </div>
-    </div>
-    <div class="app-container">
-
-        <main>
-            <div id="welcome-header"></div>
-            <section id="tab-pecas" class="tab-content active"></section>
-            <section id="tab-carros" class="tab-content"></section>
-            <section id="tab-orcamentos" class="tab-content"></section>
-        </main>
-    </div>
-
-    <div id="modal-crud"></div>
-    <div id="modal-home" class="modal">
-        <div class="modal-content home-modal">
-            <button class="close-modal" aria-label="Fechar"
-                onclick="document.getElementById('modal-home').classList.remove('show')">&times;</button>
-            <h2>Bem-vindo!</h2>
-            <div class="modal-body">
-                Este é um exemplo de modal estilizado para a página Home.
-            </div>
-            <div class="modal-actions">
-                <button class="btn primary"
-                    onclick="document.getElementById('modal-home').classList.remove('show')">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <footer class="footer">
-        &copy; 2024 DSYS. Todos os direitos reservados.
-    </footer>
+        <div id="tabPecas" class="tab-content" style="display:block;"></div>
+        <div id="tabCarros" class="tab-content" style="display:none;"></div>
+        <div id="tabOrcamentos" class="tab-content" style="display:none;"></div>
+        <div id="tabClientes" class="tab-content" style="display:none;"></div>
+        <!-- Modais serão carregados aqui -->
+        <div id="modais"></div>
+    </main>
     <script>
-        async function loadComponent(id, path) {
-            const res = await fetch(path);
-            const html = await res.text();
-            document.getElementById(id).innerHTML = html;
-        }
-        loadComponent('welcome-header', '../components/WelcomeHeader.html');
-        loadComponent('tab-pecas', '../components/TablePecas.html');
-        loadComponent('tab-carros', '../components/TableCarros.html');
-        loadComponent('tab-orcamentos', '../components/TableOrcamentos.html');
-        loadComponent('modal-crud', '../components/ModalCRUD.html').then(async () => {
-            const modalModule = await import('../scripts/modal.js');
-            if (modalModule.initModal) modalModule.initModal();
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const tabs = document.querySelectorAll('.sidebar-tab');
-            const sections = {
-                pecas: document.getElementById('tab-pecas'),
-                carros: document.getElementById('tab-carros'),
-                orcamentos: document.getElementById('tab-orcamentos')
-            };
-            tabs.forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    Object.values(sections).forEach(sec => sec.classList.remove('active'));
-                    const tabName = tab.getAttribute('data-tab');
-                    if (sections[tabName]) sections[tabName].classList.add('active');
-                });
+        
+        // Função para carregar HTML externo em um elemento
+        async function carregarComponente(arquivo, destino) {
+            const response = await fetch('../components/' + arquivo);
+            const html = await response.text();
+            document.getElementById(destino).innerHTML = html;
+            // Executar scripts embutidos, se houver
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            tempDiv.querySelectorAll('script').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.textContent = oldScript.textContent;
+                }
+                document.body.appendChild(newScript);
             });
-        });
+        }
+        // Carregar componentes das tabs
+        carregarComponente('tab-pecas.html', 'tabPecas');
+        carregarComponente('tab-carros.html', 'tabCarros');
+        carregarComponente('tab-orcamentos.html', 'tabOrcamentos');
+        carregarComponente('tab-clientes.html', 'tabClientes');
+        // Carregar modais (todos juntos)
+        (async () => {
+            const modais = [
+                'modal-adicionar-peca.html',
+                'modal-adicionar-carro.html',
+                'modal-adicionar-orcamento.html',
+                'modal-adicionar-cliente.html'
+            ];
+            let htmlTotal = '';
+            for (let arquivo of modais) {
+                const resp = await fetch('../components/' + arquivo);
+                htmlTotal += await resp.text();
+            }
+            document.getElementById('modais').innerHTML = htmlTotal;
+            // Executar scripts dos modais, se houver
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = htmlTotal;
+            tempDiv.querySelectorAll('script').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.textContent = oldScript.textContent;
+                }
+                document.body.appendChild(newScript);
+            });
+
+            // Instanciar a classe users após garantir que os modais já estão no DOM
+            import("../scripts/index.js").then(module => {
+                new module.default();
+            });
+        })();
+
+        // Tabs
+        function showTab(tab) {
+            const tabs = ['pecas', 'carros', 'orcamentos', 'clientes'];
+            tabs.forEach(t => {
+                document.getElementById('tab' + capitalize(t)).style.display = (t === tab) ? 'block' : 'none';
+                document.getElementById('tab' + capitalize(t) + 'Btn').classList.toggle('active', t === tab);
+            });
+            document.getElementById('btnAbrirModalPeca').style.display = (tab == 'pecas') ? 'inline-block' : 'none';
+            document.getElementById('btnAbrirModalCarro').style.display = (tab == 'carros') ? 'inline-block' : 'none';
+            document.getElementById('btnAbrirModalOrcamento').style.display = (tab == 'orcamentos') ? 'inline-block' : 'none';
+            document.getElementById('btnAbrirModalCliente').style.display = (tab == 'clientes') ? 'inline-block' : 'none';
+        }
+        function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+        // Modais
+        function abrirModal(id) {
+            document.getElementById(id).style.display = 'block';
+        }
+        function fecharModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+        window.abrirModal = abrirModal; // Expor global para onclick
+        window.fecharModal = fecharModal; // Expor global para onclick
+        window.onclick = function (event) {
+            ['modalCadastroPeca', 'modalCadastroCarro', 'modalCadastroOrcamento', 'modalCadastroCliente'].forEach(function (id) {
+                let modal = document.getElementById(id);
+                if (modal && event.target === modal) modal.style.display = "none";
+            });
+        }
     </script>
 </body>
 

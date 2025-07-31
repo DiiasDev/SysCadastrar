@@ -1,7 +1,8 @@
-class users {
+export default class users {
     constructor() {
         this.createUsers();
         this.login();
+        this.createPecas();
     }
 
     async createUsers() {
@@ -24,7 +25,7 @@ class users {
 
                 try {
                     // 3. Enviando dados para a API
-                    const response = await fetch("http://127.0.0.1:5000/create_users", {
+                    const response = await fetch("http://127.0.0.1:3000/create_users", {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/json'
@@ -58,7 +59,7 @@ class users {
 
                 // 2. Fazendo consulta na API
                 try {
-                    const response = await fetch("http://127.0.0.1:5000/usuarios", {
+                    const response = await fetch("http://127.0.0.1:3000/usuarios", {
                         method: "GET",
                         headers: { 'content-type': 'application/json' }
                     });
@@ -82,10 +83,10 @@ class users {
                             modalSuccess.style.display = "flex";
                             setTimeout(() => {
                                 modalSuccess.style.display = "none";
-                                window.location.href = "/SysCadastro/pages/home.html";
+                                window.location.href = "/pages/home.html";
                             }, 1200);
                         } else {
-                            window.location.href = "/SysCadastro/pages/home.html";
+                            window.location.href = "/pages/home.html";
                         }
                     } else {
                         const modalError = document.getElementById("modal-error");
@@ -103,8 +104,45 @@ class users {
             });
         }
     }
-}
 
-window.addEventListener('DOMContentLoaded', () => {
-    new users();
-});
+    createPecas() {
+        const form = document.getElementById("formAdicionarPeca");
+        if (form && !form.dataset.listenerAdded) {
+            form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const nome = document.getElementById("nome").value;
+                const categoria = document.getElementById("categoria").value;
+                const estoque = document.getElementById("estoque").value;
+                const preco = document.getElementById("preco").value;
+
+                const peca = {
+                    nome: nome,
+                    categoria: categoria,
+                    estoque: estoque,
+                    preco: preco
+                };
+
+                try {
+                    const response = await fetch("http://127.0.0.1:3000/create-pecas", {
+                        method: "POST",
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify(peca)
+                    });
+
+                    if (!response.ok) {
+                        console.log("Erro ao cadastrar peça");
+                        return;
+                    }
+
+                    const data = await response.json();
+                    console.log("Peças Criadas: ", data);
+                } catch (e) {
+                    console.log("Erro ao cadastrar peça", e);
+                }
+            });
+            form.dataset.listenerAdded = "true";
+        }
+    }
+}

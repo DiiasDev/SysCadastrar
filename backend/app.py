@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 def create_app():
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Dias1501@localhost:3306/cadastrousers'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Gabgrv123@localhost:3306/cadastrousers'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
@@ -27,4 +27,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=True)
+    app.run(port= 3000)
