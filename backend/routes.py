@@ -46,17 +46,19 @@ def create_pecas():
         print("Cadastrando peças...")
         data = request.get_json()
 
+        id = data.get("id")
         nome = data.get("nome")
         categoria = data.get("categoria")
         estoque = data.get("estoque")
         preco = data.get("preco")
 
         sql = text(
-            "INSERT INTO pecas (nome, categoria, estoque, preco) VALUES (:nome, :categoria, :estoque, :preco)"
+            "INSERT INTO pecas (id ,nome, categoria, estoque, preco) VALUES (:id, :nome, :categoria, :estoque, :preco)"
         )
         db.session.execute(
             sql,
             {
+                "id": id,
                 "nome": nome,
                 "categoria": categoria,
                 "estoque": estoque,
@@ -74,3 +76,23 @@ def create_pecas():
 @api_bp.app_errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": "Endpoint not found"}), 404
+
+
+@api_bp.route("/get-pecas", methods=["GET"])
+def get_pecas():
+    try:
+        sql = text("SELECT * FROM pecas")
+        result = db.session.execute(sql)
+        pecas = [{
+            "id": row.id,
+            "nome": row.nome,
+            "categoria": row.categoria,
+            "estoque": row.estoque,
+            "preco": row.preco,
+
+        }
+            for row in result
+        ]
+        return jsonify({"menssagem": "Sucess", "pecas": pecas})
+    except:
+        return jsonify({"menssagem": "Erro ao criar usuário"})
