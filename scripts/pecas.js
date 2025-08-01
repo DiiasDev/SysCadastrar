@@ -77,11 +77,21 @@ export default class pecas {
             pecasArray.forEach(peca => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                <td>${peca.id || ''}</td>
-                <td>${peca.nome}</td>
-                <td>${peca.categoria}</td>
-                <td>${Number(peca.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                `
+                    <td>${peca.id || ''}</td>
+                    <td>${peca.nome}</td>
+                    <td>${peca.categoria}</td>
+                    <td>${Number(peca.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>
+                        <button class="btn-icon btn-delete" title="Apagar" data-id="${peca.id}">
+                            🗑️
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn-icon btn-edit" title="Editar" data-id="${peca.id}">
+                            ✏️
+                        </button>
+                    </td>
+                `;
                 table.appendChild(row)
             })
 

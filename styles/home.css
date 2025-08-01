@@ -104,6 +104,47 @@ body {
     font-size: 15px;
 }
 
+/* Botões de ação na tabela */
+.btn-icon {
+    border: none;
+    background: #f3f3f7;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    margin: 0 2px;
+    outline: none;
+}
+
+.btn-icon.btn-delete {
+    color: #d32f2f;
+}
+
+.btn-icon.btn-edit {
+    color: #ff9800;
+}
+
+.btn-icon:hover {
+    background: #ffe066;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.btn-icon.btn-delete:hover {
+    background: #ffd6d6;
+    color: #b71c1c;
+}
+
+.btn-icon.btn-edit:hover {
+    background: #fff3e0;
+    color: #e65100;
+}
+
 /* Modal aprimorado */
 .modal {
     display: none;
