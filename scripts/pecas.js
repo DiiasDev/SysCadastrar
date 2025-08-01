@@ -69,7 +69,7 @@ export default class pecas {
 
             if(!table){
                 console.log("Tabela ainda não existe")
-                return; // Corrigido: retorna se a tabela não existe
+                return; 
             }
 
             table.innerHTML = "";

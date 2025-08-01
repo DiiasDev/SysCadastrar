@@ -10,30 +10,30 @@
 </head>
 
 <body>
-    <nav class="sidebar">
-        <button id="tabPecasBtn" class="active" onclick="showTab('pecas')">Peças</button>
-        <button id="tabCarrosBtn" onclick="showTab('carros')">Carros</button>
-        <button id="tabOrcamentosBtn" onclick="showTab('orcamentos')">Orçamentos</button>
-        <button id="tabClientesBtn" onclick="showTab('clientes')">Clientes</button>
-    </nav>
-    <main class="main-content">
-        <div class="top-actions">
-            <button id="btnAbrirModalPeca" onclick="abrirModal('modalCadastroPeca')" style="display:inline-block;">Nova
-                Peça</button>
-            <button id="btnAbrirModalCarro" onclick="abrirModal('modalCadastroCarro')" style="display:none;">Novo
-                Carro</button>
-            <button id="btnAbrirModalOrcamento" onclick="abrirModal('modalCadastroOrcamento')"
-                style="display:none;">Novo Orçamento</button>
-            <button id="btnAbrirModalCliente" onclick="abrirModal('modalCadastroCliente')" style="display:none;">Novo
-                Cliente</button>
-        </div>
-        <div id="tabPecas" class="tab-content" style="display:block;"></div>
-        <div id="tabCarros" class="tab-content" style="display:none;"></div>
-        <div id="tabOrcamentos" class="tab-content" style="display:none;"></div>
-        <div id="tabClientes" class="tab-content" style="display:none;"></div>
-        <!-- Modais serão carregados aqui -->
-        <div id="modais"></div>
-    </main>
+    <div id="sidebar"></div>
+    <div class="main-area">
+        <div id="header"></div>
+        <main class="main-content">
+            <div class="top-actions">
+                <button id="btnAbrirModalPeca" onclick="abrirModal('modalCadastroPeca')"
+                    style="display:inline-block;">Nova
+                    Peça</button>
+                <button id="btnAbrirModalCarro" onclick="abrirModal('modalCadastroCarro')" style="display:none;">Novo
+                    Carro</button>
+                <button id="btnAbrirModalOrcamento" onclick="abrirModal('modalCadastroOrcamento')"
+                    style="display:none;">Novo Orçamento</button>
+                <button id="btnAbrirModalCliente" onclick="abrirModal('modalCadastroCliente')"
+                    style="display:none;">Novo
+                    Cliente</button>
+            </div>
+            <div id="tabPecas" class="tab-content" style="display:block;"></div>
+            <div id="tabCarros" class="tab-content" style="display:none;"></div>
+            <div id="tabOrcamentos" class="tab-content" style="display:none;"></div>
+            <div id="tabClientes" class="tab-content" style="display:none;"></div>
+            <!-- Modais serão carregados aqui -->
+            <div id="modais"></div>
+        </main>
+    </div>
     <script>
 
         // Função para carregar HTML externo em um elemento
@@ -59,6 +59,10 @@
         carregarComponente('tab-carros.html', 'tabCarros');
         carregarComponente('tab-orcamentos.html', 'tabOrcamentos');
         carregarComponente('tab-clientes.html', 'tabClientes');
+        // Carregar sidebar como componente
+        carregarComponente('sidebar.html', 'sidebar');
+        // Carregar cabeçalho
+        carregarComponente('header.html', 'header');
         // Carregar modais (todos juntos)
         (async () => {
             const modais = [
@@ -97,12 +101,37 @@
             })
         })();
 
+        // Sidebar tab navigation
+        document.addEventListener('DOMContentLoaded', function () {
+            // Aguarda o carregamento do sidebar
+            const observer = new MutationObserver(() => {
+                const sidebarLinks = document.querySelectorAll('.sidebar-link');
+                if (sidebarLinks.length) {
+                    sidebarLinks.forEach(link => {
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            const tab = this.getAttribute('data-tab');
+                            showTab(tab);
+
+                            // Remove active de todos e adiciona no clicado
+                            sidebarLinks.forEach(l => l.classList.remove('active'));
+                            this.classList.add('active');
+                        });
+                    });
+                    // Ativa a primeira tab por padrão
+                    sidebarLinks[0].classList.add('active');
+                    observer.disconnect();
+                }
+            });
+            observer.observe(document.getElementById('sidebar'), { childList: true, subtree: true });
+        });
+
         // Tabs
         function showTab(tab) {
-            const tabs = ['pecas', 'carros', 'orcamentos', 'clientes'];
+            const tabs = ['pecas', 'carros', 'orcamentos', 'clientes', 'usuarios'];
             tabs.forEach(t => {
-                document.getElementById('tab' + capitalize(t)).style.display = (t === tab) ? 'block' : 'none';
-                document.getElementById('tab' + capitalize(t) + 'Btn').classList.toggle('active', t === tab);
+                const tabDiv = document.getElementById('tab' + capitalize(t));
+                if (tabDiv) tabDiv.style.display = (t === tab) ? 'block' : 'none';
             });
             document.getElementById('btnAbrirModalPeca').style.display = (tab == 'pecas') ? 'inline-block' : 'none';
             document.getElementById('btnAbrirModalCarro').style.display = (tab == 'carros') ? 'inline-block' : 'none';

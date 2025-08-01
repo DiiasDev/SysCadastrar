@@ -93,6 +93,18 @@ def get_pecas():
         }
             for row in result
         ]
-        return jsonify({"menssagem": "Sucess", "pecas": pecas})
+        return jsonify({"mensagem": "Sucess", "pecas": pecas})
     except:
-        return jsonify({"menssagem": "Erro ao criar usuário"})
+        return jsonify({"mensagem": "Erro ao criar usuário"})
+
+
+@api_bp.route("/delete-pecas/<int:id_peca>", methods=["DELETE"])
+def delete_pecas(id_peca):
+    try:
+        sql = text("DELETE FROM pecas WHERE id = :id_peca ")
+        resutl = db.session.execute(sql, {"id_peca": id_peca})
+        db.session.commit()
+
+        return jsonify({"mensagem": "Sucess", "deleted": id_peca})
+    except:
+        return jsonify({"mensagem": "Erro ao deletar peça..."})
