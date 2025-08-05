@@ -107,6 +107,13 @@
                 carsInstance.deletCars();
 
             });
+
+            import("../scripts/clients.js").then(module => {
+                const clientInstance = new module.default(); 
+                clientInstance.createClients();
+                clientInstance.getClients();
+                clientInstance.deleteClients();
+            })
         })();
 
         // Sidebar tab navigation

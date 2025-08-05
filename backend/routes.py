@@ -182,3 +182,62 @@ def delete_car(id_carro):
     except Exception as e:
         print("Erro ao deletar carro:", e)
         return jsonify({"status": "Error", "message": "Erro ao deletar carro"})
+
+
+@api_bp.route("/create-clients", methods=["POST"])
+def create_clients():
+    try:
+
+        data = request.get_json()
+
+        nome = data.get("nome")
+        telefone = data.get("telefone")
+        email = data.get("email")
+
+        sql = text(
+            "INSERT INTO clientes (nome, telefone, email) VALUES (:nome, :telefone, :email)")
+        db.session.execute(sql, {
+            "nome": nome,
+            "telefone": telefone,
+            "email": email
+        })
+
+        db.session.commit()
+
+        return jsonify({"status": "sucess", "message": "Sucesso ao cadastrar cliente"})
+    except:
+        return jsonify({"status": "error", "message": "Erro ao cadastrar clientes"})
+
+
+@api_bp.route("/clients", methods=["GET"])
+def get_clients():
+    try:
+
+        sql = text("SELECT * FROM clientes")
+        result = db.session.execute(sql)
+        clientes = [
+            {
+                "id": row.id,
+                "nome": row.nome,
+                "telefone": row.telefone,
+                "email": row.email
+            }
+            for row in result
+        ]
+
+        return jsonify({f"status": "sucess", "clients":  clientes})
+    except:
+        return jsonify({"status": "error", "message": "Erro ao buscar clientes"})
+    
+@api_bp.route("/delete-client/<int:id_client>", methods=["DELETE"]) 
+def delete_clients(id_client):
+    try: 
+        
+        sql = text("DELETE FROM clientes WHERE id = :id_client")
+        db.session.execute(sql, {"id_client": id_client})
+        db.session.commit()
+        
+        return jsonify({"status": "sucess", "message": "Sucesso ao deletar cliente"})
+    except Exception as e:
+        print("Erro ao deletar cliente", e)
+        return jsonify({"status": "error", "message": "Erro ao deletar cliente"})
