@@ -47,16 +47,16 @@ export default class pecas {
         }
     }
 
-    async getPecas(){
-        try{
+    async getPecas() {
+        try {
             console.log("Buscando peças...")
 
-            const response = await fetch("http://127.0.0.1:3000/get-pecas",{
+            const response = await fetch("http://127.0.0.1:3000/get-pecas", {
                 method: "GET",
-                headers: {'content-type': 'application/json'},
+                headers: { 'content-type': 'application/json' },
             })
 
-            if(!response){
+            if (!response) {
                 console.log("Erro ao receber resposta...")
             }
 
@@ -67,9 +67,9 @@ export default class pecas {
 
             const table = document.querySelector("#tabelaPecas tbody");
 
-            if(!table){
+            if (!table) {
                 console.log("Tabela ainda não existe")
-                return; 
+                return;
             }
 
             table.innerHTML = "";
@@ -77,27 +77,60 @@ export default class pecas {
             pecasArray.forEach(peca => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${peca.id || ''}</td>
-                    <td>${peca.nome}</td>
-                    <td>${peca.categoria}</td>
-                    <td>${Number(peca.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                    <td>
-                        <button class="btn-icon btn-delete" title="Apagar" data-id="${peca.id}">
-                            🗑️
-                        </button>
-                    </td>
-                    <td>
-                        <button class="btn-icon btn-edit" title="Editar" data-id="${peca.id}">
-                            ✏️
-                        </button>
-                    </td>
-                `;
+        <td>${peca.id || ''}</td>
+        <td>${peca.nome}</td>
+        <td>${peca.categoria}</td>
+        <td>${Number(peca.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+        <td>
+            <button class="btn-icon btn-delete btnApagar" title="Apagar" data-id="${peca.id}">
+                🗑️
+            </button>
+        </td>
+    `;
                 table.appendChild(row)
             })
 
+            await this.deletPecas();
 
-        } catch(error){
+
+        } catch (error) {
             console.log("Erro ao buscar peças...", error)
+        }
+    }
+
+    async deletPecas() {
+        try {
+            console.log("Apagando linha")
+
+            // 1. Capturando todo os botões de apagar
+            const btnApagar = document.querySelectorAll(".btnApagar");
+
+            // 2. Percorrendo todos os botões de delete 
+            btnApagar.forEach((botao) => {
+                // 3. Adicionando evento de click
+                botao.addEventListener('click', async (event) => {
+                    console.log("Clicou em apagar")
+
+                    event.stopPropagation();
+
+                    // 4. Capturando linha selecionada
+                    const row = event.target.closest('tr');
+
+                    // 5. Capturando id da linha
+                    const id = botao.getAttribute('data-id');
+
+                    // 6. Fazendo o fetch para o método de delete no backend.
+                    const response = await fetch(`http://127.0.0.1:3000/delete-pecas/${id}`,
+                        { method: "DELETE" }
+                    )
+
+                    // 7. Removendo a linha da tabela.
+                    row.remove()
+                })
+            })
+
+        } catch (error) {
+            console.log("Erro ao apagar linha...", error)
         }
     }
 }

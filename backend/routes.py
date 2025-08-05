@@ -108,3 +108,58 @@ def delete_pecas(id_peca):
         return jsonify({"mensagem": "Sucess", "deleted": id_peca})
     except:
         return jsonify({"mensagem": "Erro ao deletar peça..."})
+
+
+@api_bp.route("/create-cars", methods=["POST"])
+def create_cars():
+    try:
+        print("Cadastrando carros...")
+
+        data = request.get_json()
+
+        placa = data.get("placa")
+        modelo = data.get("modelo")
+        marca = data.get("marca")
+        ano = data.get("ano")
+        motor = data.get("motor")
+
+        sql = text(
+            "INSERT INTO carros  (modelo, marca, ano, motor, placa) VALUES (:modelo, :marca, :ano, :motor, :placa)")
+        db.session.execute(
+            sql,
+            {
+                "placa": placa,
+                "modelo": modelo,
+                "marca": marca,
+                "ano": ano,
+                "motor": motor
+            }
+        )
+
+        db.session.commit()
+
+        return jsonify({"status": "Sucess", "message": "Sucesso ao cadastrar carro..."})
+    except:
+        print("Erro ao cadastrar carros..")
+
+
+@api_bp.route("/get-cars", methods=["GET"])
+def get_cars():
+    try:
+        print("Pegando carros...")
+
+        sql = text("SELECT * FROM carros")
+        result = db.session.execute(sql)
+        carros = [
+            {
+                "modelo": row.modelo,
+                "marca": row.marca,
+                "ano": row.ano,
+                "motor": row.motor,
+                "placa": row.placa
+            }
+            for row in result
+        ]
+        return jsonify({"status": "Sucess", "carros": carros})
+    except:
+        print("Erro ao pegar carros...")
