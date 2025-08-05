@@ -99,12 +99,12 @@
                 const pecasInstance = new module.default();
                 pecasInstance.getPecas();
                 pecasInstance.deletPecas();
-            })
+            });
 
             import("../scripts/cars.js").then(module => {
                 const carsInstance = new module.default();
-                carsInstance.createCars();
-            })
+                carsInstance.getCars();
+            });
         })();
 
         // Sidebar tab navigation

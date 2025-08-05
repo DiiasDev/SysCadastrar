@@ -1,4 +1,4 @@
-export default class users {
+class users {
     constructor() {
         this.createUsers();
         this.login();
@@ -10,10 +10,23 @@ export default class users {
             form.addEventListener("submit", async (event) => {
                 event.preventDefault();
 
+                // Mostrar modal de loading
+                const modalLoading = document.getElementById("modal-loading");
+                if (modalLoading) {
+                    modalLoading.style.display = "flex";
+                }
+
                 // 1. Pegar dados do formulário
                 const name = document.getElementById("name").value;
                 const email = document.getElementById("emailCadastro").value;
                 const password = document.getElementById("passwordCadastro").value;
+
+                // Validação básica
+                if (!name || !email || !password) {
+                    this.showErrorModal("Todos os campos são obrigatórios");
+                    if (modalLoading) modalLoading.style.display = "none";
+                    return;
+                }
 
                 // 2. Montar o objeto (usuário) que será enviado a API 
                 const user = {
@@ -32,17 +45,52 @@ export default class users {
                         body: JSON.stringify(user)
                     });
 
+                    // Esconder modal de loading
+                    if (modalLoading) modalLoading.style.display = "none";
+
                     if (!response.ok) {
-                        throw new Error("Erro na request");
+                        const errorData = await response.text();
+                        throw new Error(`Erro ${response.status}: ${errorData}`);
                     }
 
                     const data = await response.json();
                     console.log("DADOS:", data);
 
+                    // Mostrar modal de sucesso
+                    const modalSuccess = document.getElementById("modal-success");
+                    if (modalSuccess) {
+                        modalSuccess.style.display = "flex";
+                        setTimeout(() => {
+                            modalSuccess.style.display = "none";
+                            // Limpar formulário
+                            form.reset();
+                            // Opcional: redirecionar para login
+                            // window.location.href = "/index.html";
+                        }, 2000);
+                    }
+
                 } catch (e) {
                     console.log("Erro ao fazer um POST a API", e);
+                    // Esconder modal de loading
+                    if (modalLoading) modalLoading.style.display = "none";
+                    // Mostrar modal de erro
+                    this.showErrorModal("Erro ao cadastrar usuário. Verifique se a API está rodando.");
                 }
             });
+        }
+    }
+
+    showErrorModal(message) {
+        const modalError = document.getElementById("modal-error");
+        if (modalError) {
+            const errorSpan = modalError.querySelector("span");
+            if (errorSpan) {
+                errorSpan.textContent = message;
+            }
+            modalError.style.display = "flex";
+            setTimeout(() => {
+                modalError.style.display = "none";
+            }, 3000);
         }
     }
 
@@ -104,6 +152,11 @@ export default class users {
         }
     }
 }
+
+// Instanciar a classe quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', () => {
+    new users();
+});
 
 // CommonJS export for compatibility
 window.users = users;

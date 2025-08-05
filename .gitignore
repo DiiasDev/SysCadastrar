@@ -1,0 +1,23 @@
+# Ignora arquivos e pastas temporárias do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignora pastas de dependências comuns
+node_modules/
+backend/venv/
+.env
+
+# Ignora arquivos de log
+*.log
+
+# Ignora arquivos de configuração pessoais
+*.env
+*.local
+
+# Ignora builds
+dist/
+build/
+
+# Ignorar arquivos .pyc e a pasta __pycache__ em qualquer lugar do projeto
+__pycache__/
+*.pyc

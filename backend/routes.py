@@ -139,8 +139,10 @@ def create_cars():
         db.session.commit()
 
         return jsonify({"status": "Sucess", "message": "Sucesso ao cadastrar carro..."})
-    except:
-        print("Erro ao cadastrar carros..")
+    except Exception as e:
+        db.session.rollback()
+        print("Erro ao cadastrar carros..", e)
+        return jsonify({"status": "error", "message": "Erro ao cadastrar carro"}), 500
 
 
 @api_bp.route("/get-cars", methods=["GET"])
@@ -152,6 +154,7 @@ def get_cars():
         result = db.session.execute(sql)
         carros = [
             {
+                "id": row.id,
                 "modelo": row.modelo,
                 "marca": row.marca,
                 "ano": row.ano,
@@ -161,5 +164,6 @@ def get_cars():
             for row in result
         ]
         return jsonify({"status": "Sucess", "carros": carros})
-    except:
-        print("Erro ao pegar carros...")
+    except Exception as e:
+        print("Erro ao pegar carros...", e)
+        return jsonify({"status": "error", "message": "Erro ao buscar carros"}), 500
