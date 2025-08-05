@@ -1,6 +1,7 @@
-export default class cars {
+export default class Cars {
     constructor() {
-        this.createCars()
+        this.createCars();
+        this.deletCars();
     }
 
     async createCars() {
@@ -83,16 +84,45 @@ export default class cars {
                 <td>${carro.motor || ''}</td>
                 <td>${carro.placa || ''}</td>
                 <td>
-                    <button class="btn-icon btn-delete btnApagar" title="Apagar" data-id="${carro.id}">
+                    <button class="btn-icon btn-delete btnApagarCarro" title="Apagar" data-id="${carro.id}">
                         🗑️
                     </button>
                 </td>
                 `;
 
                 table.appendChild(row);
-            })
+            });
+
+            this.deletCars();
         } catch (error) {
             console.log("Erro ao buscar carros...", error)
+        }
+    }
+
+    async deletCars() {
+        try {
+            console.log("Deletando carros...")
+
+            const btnApagarCarro = document.querySelectorAll(".btnApagarCarro")
+
+            btnApagarCarro.forEach((botao) => {
+                botao.addEventListener("click", async (event) => {
+                    console.log("Clicou em apagar carro")
+
+                    event.stopPropagation();
+
+                    const row = event.target.closest("tr");
+
+                    const id_row = botao.getAttribute("data-id");
+
+                    const response = fetch(`http://127.0.0.1:3000/delete-cars/${id_row}`, { method: "DELETE" })
+
+                    row.remove()
+                })
+            })
+
+        } catch (error) {
+            return "erro ao excluir carro"
         }
     }
 }

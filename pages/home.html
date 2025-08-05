@@ -104,6 +104,8 @@
             import("../scripts/cars.js").then(module => {
                 const carsInstance = new module.default();
                 carsInstance.getCars();
+                carsInstance.deletCars();
+
             });
         })();
 

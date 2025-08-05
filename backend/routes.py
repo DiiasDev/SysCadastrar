@@ -167,3 +167,18 @@ def get_cars():
     except Exception as e:
         print("Erro ao pegar carros...", e)
         return jsonify({"status": "error", "message": "Erro ao buscar carros"}), 500
+
+
+@api_bp.route("/delete-cars/<int:id_carro>", methods=["DELETE"])
+def delete_car(id_carro):
+    try:
+        print("Deletando carro")
+
+        sql = text("DELETE FROM carros WHERE id = :id_carro")
+        db.session.execute(sql, {"id_carro": id_carro})
+        db.session.commit()
+
+        return jsonify({"status": "Sucess", "message": "Sucesso ao deletar carro"})
+    except Exception as e:
+        print("Erro ao deletar carro:", e)
+        return jsonify({"status": "Error", "message": "Erro ao deletar carro"})
