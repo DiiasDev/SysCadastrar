@@ -14,6 +14,11 @@ export default class Clients {
                 const telefone = document.getElementById("telefone").value;
                 const email = document.getElementById("email").value;
 
+                if (telefone.length !== 11) {
+                    alert("Número incorreto ou sem DDD");
+                    return;
+                }
+
                 const client = {
                     nome: nome,
                     telefone: telefone,
@@ -42,7 +47,6 @@ export default class Clients {
 
     async getClients() {
         try {
-            console.log("Buscando clientes...")
 
             const response = await fetch("http://127.0.0.1:3000/clients",
                 {
@@ -72,7 +76,7 @@ export default class Clients {
                 row.innerHTML = `
                         <td>${client.id || ''}</td>
                         <td>${client.nome || ''}</td>
-                        <td>${client.telefone || ''}</td>
+                        <td>${this.formatarTelefone(client.telefone) || ''}</td>
                         <td>${client.email || ''}</td>
                         <td>
                         <button class="btn-icon btn-delete btnApagarClient" title="Apagar" data-id="${client.id}">
@@ -86,6 +90,7 @@ export default class Clients {
             })
 
             this.deleteClients();
+            this.formatarTelefone()
 
         } catch (error) {
             console.error("Erro ao buscar clientes")
@@ -93,22 +98,44 @@ export default class Clients {
     }
 
     async deleteClients() {
-        try{
-            const btnApagar = document.querySelectorAll(".btnApagarClient"); 
+        try {
+            const btnApagar = document.querySelectorAll(".btnApagarClient");
             btnApagar.forEach((botao) => {
                 botao.addEventListener("click", async (event) => {
 
-                    const row = event.target.closest("tr"); 
+                    const row = event.target.closest("tr");
 
                     const rowId = botao.getAttribute("data-id")
-                    
-                    const response = await fetch(`http://127.0.0.1:3000/delete-client/${rowId}`, {method: "DELETE"})
+
+                    const response = await fetch(`http://127.0.0.1:3000/delete-client/${rowId}`, { method: "DELETE" })
 
                     row.remove()
                 })
             })
-        }catch(e){
+        } catch (e) {
             console.error("Erro ao deletar clientes...")
         }
+    }
+
+    async formatNumber() {
+        try {
+            const response = await fetch("http://127.0.0.1:3000/clients",
+                {
+                    method: "GET",
+                    headers: { 'content-type': 'application/json' },
+                })
+
+            const data = await response.json()
+            const telefoneFormated = data.clients.map(client => formatarTelefone(client.telefone))
+            
+        } catch (error) {
+            console.error("Erro ao formatar valores.", error)
+        }
+    }
+
+    formatarTelefone(telefone) {
+        telefone = telefone.replace(/\D/g, "");
+
+        return telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3")
     }
 }

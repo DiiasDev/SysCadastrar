@@ -29,18 +29,16 @@ export default class pecas {
                     });
 
                     if (!response.ok) {
-                        console.log("Erro ao cadastrar peça");
+                        console.error("Erro ao cadastrar peça");
                         return;
                     }
 
                     const data = await response.json();
-                    console.log("Peças Criadas: ", data);
 
-                    // Atualiza a tabela em tempo real
                     await this.getPecas();
 
                 } catch (e) {
-                    console.log("Erro ao cadastrar peça", e);
+                    console.error("Erro ao cadastrar peça", e);
                 }
             });
             form.dataset.listenerAdded = "true";
@@ -49,7 +47,6 @@ export default class pecas {
 
     async getPecas() {
         try {
-            console.log("Buscando peças...")
 
             const response = await fetch("http://127.0.0.1:3000/get-pecas", {
                 method: "GET",
@@ -57,18 +54,17 @@ export default class pecas {
             })
 
             if (!response) {
-                console.log("Erro ao receber resposta...")
+                console.error("Erro ao receber resposta...")
             }
 
             const data = await response.json()
-            console.log("Dados recebidos: ", data)
 
             const pecasArray = Array.isArray(data.pecas) ? data.pecas : data.pecas;
 
             const table = document.querySelector("#tabelaPecas tbody");
 
             if (!table) {
-                console.log("Tabela ainda não existe")
+                console.error("Tabela ainda não existe")
                 return;
             }
 
@@ -100,8 +96,6 @@ export default class pecas {
 
     async deletPecas() {
         try {
-            console.log("Apagando linha")
-
             // 1. Capturando todo os botões de apagar
             const btnApagar = document.querySelectorAll(".btnApagar");
 
@@ -109,7 +103,6 @@ export default class pecas {
             btnApagar.forEach((botao) => {
                 // 3. Adicionando evento de click
                 botao.addEventListener('click', async (event) => {
-                    console.log("Clicou em apagar")
 
                     event.stopPropagation();
 
@@ -130,7 +123,7 @@ export default class pecas {
             })
 
         } catch (error) {
-            console.log("Erro ao apagar linha...", error)
+            console.error("Erro ao apagar linha...", error)
         }
     }
 }
