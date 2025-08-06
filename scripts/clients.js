@@ -2,7 +2,6 @@ export default class Clients {
     constructor() {
         this.createClients();
         this.getClients();
-        this.deleteClients();
     }
 
     async createClients() {
@@ -11,7 +10,7 @@ export default class Clients {
             form.addEventListener("submit", async (event) => {
                 event.preventDefault();
 
-                const nome = document.getElementById("nome").value;
+                const nome = document.getElementById("nomeClient").value;
                 const telefone = document.getElementById("telefone").value;
                 const email = document.getElementById("email").value;
 
@@ -28,11 +27,10 @@ export default class Clients {
                 })
 
                 if (!response) {
-                    console.log("Erro ao receber resposta")
+                    console.error("Erro ao receber resposta")
                 }
 
                 const data = await response.json();
-                console.log("Sucesso ao cadastrar clientes: ", data)
 
                 await this.getClients();
             })
@@ -57,14 +55,13 @@ export default class Clients {
             }
 
             const data = await response.json()
-            console.log("Clientes Recebidos:", data.clients)
 
             const clientsArray = Array.isArray(data.clients) ? data.clients : [];
 
             const table = document.querySelector("#tabelaClientes tbody");
 
             if (!table) {
-                console.log("Erro ao instanciar tabela")
+                console.error("Erro ao instanciar tabela")
                 return
             }
 
@@ -74,21 +71,44 @@ export default class Clients {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                         <td>${client.id || ''}</td>
-                        <td>${client.nome || 'aaa'}</td>
+                        <td>${client.nome || ''}</td>
                         <td>${client.telefone || ''}</td>
                         <td>${client.email || ''}</td>
+                        <td>
+                        <button class="btn-icon btn-delete btnApagarClient" title="Apagar" data-id="${client.id}">
+                            🗑️
+                        </button>
+                    </td>
                 `;
 
                 table.appendChild(row)
 
             })
 
+            this.deleteClients();
+
         } catch (error) {
             console.error("Erro ao buscar clientes")
         }
     }
 
-    async deleteClients(idClient) {
+    async deleteClients() {
+        try{
+            const btnApagar = document.querySelectorAll(".btnApagarClient"); 
+            btnApagar.forEach((botao) => {
+                botao.addEventListener("click", async (event) => {
 
+                    const row = event.target.closest("tr"); 
+
+                    const rowId = botao.getAttribute("data-id")
+                    
+                    const response = await fetch(`http://127.0.0.1:3000/delete-client/${rowId}`, {method: "DELETE"})
+
+                    row.remove()
+                })
+            })
+        }catch(e){
+            console.error("Erro ao deletar clientes...")
+        }
     }
 }

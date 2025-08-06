@@ -9,7 +9,6 @@ export default class Cars {
             const form = document.getElementById("formAdicionarCarros");
             form.addEventListener("submit", async (event) => {
                 event.preventDefault();
-                console.log("Cadastrando carros... ")
 
                 const placa = document.getElementById("placaCarro").value;
                 const modelo = document.getElementById("modeloCarro").value;
@@ -32,23 +31,21 @@ export default class Cars {
                 })
 
                 if (!response) {
-                    console.log("Erro ao fazer fetch")
+                    console.error("Erro ao fazer fetch")
                 }
 
                 const data = await response.json()
-                console.log("carros cadastrados: ", data)
 
                 await this.getCars()
 
             })
         } catch (error) {
-            console.log("Erro ao cadastrar carros", error)
+            console.error("Erro ao cadastrar carros", error)
         }
     }
 
     async getCars() {
         try {
-            console.log("Buscando carros...")
 
             const response = await fetch("http://127.0.0.1:3000/get-cars", {
                 method: "GET",
@@ -56,11 +53,10 @@ export default class Cars {
             })
 
             if (!response) {
-                console.log("Erro ao receber resposta...")
+                console.error("Erro ao receber resposta...")
             }
 
             const data = await response.json();
-            console.log("Carros recebidos: ", data)
 
 
             const carsArray = Array.isArray(data.carros) ? data.carros : data.carros;
@@ -68,7 +64,7 @@ export default class Cars {
             const table = document.querySelector("#tabelaCarros tbody");
 
             if (!table) {
-                console.log("Tabela ainda não foi instanciada...")
+                console.error("Tabela ainda não foi instanciada...")
                 return
             }
 
@@ -95,19 +91,17 @@ export default class Cars {
 
             this.deletCars();
         } catch (error) {
-            console.log("Erro ao buscar carros...", error)
+            console.error("Erro ao buscar carros...", error)
         }
     }
 
     async deletCars() {
         try {
-            console.log("Deletando carros...")
 
             const btnApagarCarro = document.querySelectorAll(".btnApagarCarro")
 
             btnApagarCarro.forEach((botao) => {
                 botao.addEventListener("click", async (event) => {
-                    console.log("Clicou em apagar carro")
 
                     event.stopPropagation();
 

@@ -21,3 +21,5 @@ build/
 # Ignorar arquivos .pyc e a pasta __pycache__ em qualquer lugar do projeto
 __pycache__/
 *.pyc
+
+backend/app.py

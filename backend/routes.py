@@ -187,7 +187,6 @@ def delete_car(id_carro):
 @api_bp.route("/create-clients", methods=["POST"])
 def create_clients():
     try:
-
         data = request.get_json()
 
         nome = data.get("nome")
