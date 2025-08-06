@@ -16,20 +16,20 @@
         <main class="main-content">
             <div class="top-actions">
                 <button id="btnAbrirModalPeca" onclick="abrirModal('modalCadastroPeca')"
-                    style="display:inline-block;">Nova
+                    style="display:none;">Nova
                     Peça</button>
                 <button id="btnAbrirModalCarro" onclick="abrirModal('modalCadastroCarro')" style="display:none;">Novo
                     Carro</button>
                 <button id="btnAbrirModalOrcamento" onclick="abrirModal('modalCadastroOrcamento')"
                     style="display:none;">Novo Orçamento</button>
                 <button id="btnAbrirModalCliente" onclick="abrirModal('modalCadastroCliente')"
-                    style="display:none;">Novo
+                    style="display:inline-block;">Novo
                     Cliente</button>
             </div>
-            <div id="tabPecas" class="tab-content" style="display:block;"></div>
+            <div id="tabPecas" class="tab-content" style="display:none;"></div>
             <div id="tabCarros" class="tab-content" style="display:none;"></div>
             <div id="tabOrcamentos" class="tab-content" style="display:none;"></div>
-            <div id="tabClientes" class="tab-content" style="display:none;"></div>
+            <div id="tabClientes" class="tab-content" style="display:block;"></div>
             <!-- Modais serão carregados aqui -->
             <div id="modais"></div>
         </main>
@@ -133,8 +133,9 @@
                             this.classList.add('active');
                         });
                     });
-                    // Ativa a primeira tab por padrão
-                    sidebarLinks[0].classList.add('active');
+                    // Ativa a tab de clientes por padrão
+                    const clientesLink = Array.from(sidebarLinks).find(link => link.getAttribute('data-tab') === 'clientes');
+                    if (clientesLink) clientesLink.classList.add('active');
                     observer.disconnect();
                 }
             });

@@ -19,6 +19,19 @@ export default class Clients {
                     return;
                 }
 
+                const existingClientsResponse = await fetch("http://127.0.0.1:3000/clients", {
+                    method: "GET",
+                    headers: { 'content-type': 'application/json' },
+                });
+
+                const existingData = await existingClientsResponse.json();
+                const clientExists = Array.isArray(existingData.clients) ? existingData.clients : [];
+
+                if (clientExists.some(client => client.email === email)) {
+                    alert("Email já cadastrado");
+                    return;
+                }
+
                 const client = {
                     nome: nome,
                     telefone: telefone,
@@ -54,11 +67,11 @@ export default class Clients {
                     headers: { 'content-type': 'application/json' },
                 })
 
+            const data = await response.json()
+
             if (!response) {
                 console.error("Erro ao receber resposta")
             }
-
-            const data = await response.json()
 
             const clientsArray = Array.isArray(data.clients) ? data.clients : [];
 
@@ -93,7 +106,7 @@ export default class Clients {
             this.formatarTelefone()
 
         } catch (error) {
-            console.error("Erro ao buscar clientes")
+            console.error("Erro ao buscar clientes", error)
         }
     }
 
@@ -127,7 +140,7 @@ export default class Clients {
 
             const data = await response.json()
             const telefoneFormated = data.clients.map(client => formatarTelefone(client.telefone))
-            
+
         } catch (error) {
             console.error("Erro ao formatar valores.", error)
         }

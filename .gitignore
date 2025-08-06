@@ -23,3 +23,8 @@ __pycache__/
 *.pyc
 
 backend/app.py
+app.py
+
+package-lock.json
+package.json
+.gitignore
