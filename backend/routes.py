@@ -247,7 +247,9 @@ def delete_clients(id_client):
 @api_bp.route("/create-orcamento", methods=["POST"])
 def create_orcamento():
     try:
+        print("=== CRIANDO ORÇAMENTO ===")
         data = request.get_json()
+        print(f"Dados recebidos: {data}")
         
         if not data:
             return jsonify({"status": "error", "message": "Dados não fornecidos"}), 400
@@ -258,6 +260,8 @@ def create_orcamento():
         valor = data.get("valor")
         data_orcamento = data.get("data_orcamento")
         pecas = data.get("pecas")
+
+        print(f"Cliente ID: {cliente_id}, Carro ID: {carro_id}")
 
         # Validar campos obrigatórios
         if not cliente_id:
@@ -289,40 +293,56 @@ def create_orcamento():
             except ValueError:
                 return jsonify({"status": "error", "message": "Formato de data inválido. Use DD/MM/YYYY."}), 400
 
-        # 1. Inserir orçamento
+        # 1. Inserir orçamento e obter o ID corretamente
         sql = text(
             "INSERT INTO orcamentos (cliente_id, carro_id, servicos, valor, data_orcamento) VALUES (:cliente_id, :carro_id, :servicos, :valor, :data_orcamento)"
         )
-        db.session.execute(sql, {
+        result = db.session.execute(sql, {
             "cliente_id": cliente_id,
             "carro_id": carro_id,
             "servicos": servicos,
             "valor": valor,
             "data_orcamento": data_orcamento
         })
-        db.session.commit()
+        
+        # Commit imediatamente após inserir o orçamento
+        db.session.flush()  # Flush para obter o ID sem commit completo
+        
+        # Obter o ID do orçamento inserido
+        orcamento_id = result.lastrowid
+        print(f"ID do orçamento criado: {orcamento_id}")
+        
+        # Verificar se o ID foi obtido corretamente
+        if not orcamento_id:
+            db.session.rollback()
+            return jsonify({"status": "error", "message": "Erro ao obter ID do orçamento"}), 500
 
-        # 2. Recuperar o id do orçamento recém-criado
-        orcamento_id = db.session.execute(
-            text("SELECT LAST_INSERT_ID()")).scalar()
-
-        # 3. Inserir peças do orçamento (se houver)
+        # 2. Inserir peças do orçamento (se houver)
         if pecas:
+            print(f"Inserindo {len(pecas)} peças")
             for peca in pecas:
                 if not isinstance(peca, dict):
                     continue
                     
-                sql_peca = text(
-                    "INSERT INTO orcamento_pecas (orcamento_id, peca_id, quantidade) VALUES (:orcamento_id, :peca_id, :quantidade)"
-                )
-                db.session.execute(sql_peca, {
-                    "orcamento_id": orcamento_id,
-                    "peca_id": peca.get("peca_id"),
-                    "quantidade": peca.get("quantidade", 1)
-                })
-            db.session.commit()
+                peca_id = peca.get("peca_id")
+                quantidade = peca.get("quantidade", 1)
+                
+                if peca_id:
+                    sql_peca = text(
+                        "INSERT INTO orcamento_pecas (orcamento_id, peca_id, quantidade) VALUES (:orcamento_id, :peca_id, :quantidade)"
+                    )
+                    db.session.execute(sql_peca, {
+                        "orcamento_id": orcamento_id,
+                        "peca_id": peca_id,
+                        "quantidade": quantidade
+                    })
+                    print(f"Peça {peca_id} inserida com quantidade {quantidade}")
+        
+        # Commit tudo de uma vez
+        db.session.commit()
+        print("Orçamento criado com sucesso!")
 
-        # 4. Buscar dados completos do orçamento criado
+        # 3. Buscar dados completos do orçamento criado
         sql_orcamento = text("""
             SELECT o.id, o.servicos, o.valor, o.data_orcamento,
                    c.nome as cliente_nome, 
@@ -337,7 +357,10 @@ def create_orcamento():
             sql_orcamento, {"orcamento_id": orcamento_id})
         orcamento_row = orcamento_result.fetchone()
 
-        # 5. Buscar peças do orçamento
+        if not orcamento_row:
+            return jsonify({"status": "error", "message": "Orçamento criado mas não encontrado"}), 500
+
+        # 4. Buscar peças do orçamento
         sql_pecas = text("""
             SELECT op.peca_id, op.quantidade, p.nome, p.categoria, p.preco
             FROM orcamento_pecas op
@@ -351,7 +374,7 @@ def create_orcamento():
                 "peca_id": peca_row.peca_id,
                 "nome": peca_row.nome,
                 "categoria": peca_row.categoria,
-                "preco": peca_row.preco,
+                "preco": float(peca_row.preco) if peca_row.preco else 0,
                 "quantidade": peca_row.quantidade
             }
             for peca_row in pecas_result
@@ -363,16 +386,17 @@ def create_orcamento():
             "carro_modelo": orcamento_row.carro_modelo,
             "carro_placa": orcamento_row.carro_placa,
             "servicos": orcamento_row.servicos,
-            "valor": orcamento_row.valor,
+            "valor": float(orcamento_row.valor) if orcamento_row.valor else 0,
             "data_orcamento": orcamento_row.data_orcamento,
             "pecas": pecas_data
         }
 
         return jsonify({"status": "sucess", "message": "Sucesso ao criar orçamentos", "orcamento": orcamento_criado})
+        
     except Exception as e:
         db.session.rollback()
         print("Erro ao criar orçamento:", e)
-        return jsonify({"status": "error", "message": "Erro ao criar orçamentos"})
+        return jsonify({"status": "error", "message": f"Erro ao criar orçamentos: {str(e)}"}), 500
 
 
 @api_bp.route("/orcamentos", methods=["GET"])

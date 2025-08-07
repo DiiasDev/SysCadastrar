@@ -115,10 +115,8 @@
             })
 
             import("../scripts/orcamentos.js").then(module => {
-                const orcamentoInstance = new module.default();
-                // orcamentoInstance.createClients();
-                orcamentoInstance.getOrcamentos();
-                // orcamentoInstance.deleteClients();
+                window.orcamentoInstance = new module.default();
+                window.orcamentoInstance.getOrcamentos();
             })
         })();
 
@@ -165,6 +163,17 @@
         // Modais
         function abrirModal(id) {
             document.getElementById(id).style.display = 'block';
+            // Repopulate selects when opening orcamento modal
+            if (id === 'modalCadastroOrcamento' && window.orcamentoInstance) {
+                // Give a longer delay to ensure everything is loaded
+                setTimeout(async () => {
+                    try {
+                        await window.orcamentoInstance.populateSelects();
+                    } catch (error) {
+                        console.error("Erro ao popular selects:", error);
+                    }
+                }, 300);
+            }
         }
         function fecharModal(id) {
             document.getElementById(id).style.display = 'none';

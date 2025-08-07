@@ -3,19 +3,84 @@
     <span class="close">&times;</span>
     <h2>Cadastro de Orçamento</h2>
     <form id="formCadastroOrcamento">
-      <label for="clienteOrcamento">Cliente:</label>
-      <input type="text" id="clienteOrcamento" name="clienteOrcamento" required>
-      <label for="carroOrcamento">Carro:</label>
-      <input type="text" id="carroOrcamento" name="carroOrcamento" required>
-      <label for="carroOrcamento">Peças:</label>
-      <input type="text" id="pecaOrcamento" name="carroOrcamento" required>
-      <label for="carroOrcamento">Serviços:</label>
-      <input type="text" id="servicoOrcamento" name="carroOrcamento" required>
-      <label for="valorOrcamento">Valor:</label>
-      <input type="number" id="valorOrcamento" name="valorOrcamento" step="0.01" required>
-      <label for="carroOrcamento">Data:</label>
-      <input type="date" id="dataOrcamento" name="carroOrcamento" required>
+      <div class="form-group">
+        <label for="clienteOrcamento">Cliente:</label>
+        <select id="clienteOrcamento" name="clienteOrcamento" required>
+          <option value="">Selecione um cliente</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="carroOrcamento">Carro:</label>
+        <select id="carroOrcamento" name="carroOrcamento" required>
+          <option value="">Selecione um carro</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Peças:</label>
+        <div id="pecasContainer">
+          <div class="peca-item">
+            <select name="pecaOrcamento[]" required>
+              <option value="">Selecione uma peça</option>
+            </select>
+            <input type="number" name="quantidadePeca[]" placeholder="Qtd" min="1" value="1" required>
+            <button type="button" class="btn-remove-peca" onclick="removePeca(this)" style="display:none;">Remover</button>
+          </div>
+        </div>
+        <button type="button" id="btnAdicionarPeca" onclick="adicionarPeca()">+ Adicionar Peça</button>
+      </div>
+      
+      <div class="form-group">
+        <label for="servicoOrcamento">Serviços:</label>
+        <input type="text" id="servicoOrcamento" name="servicoOrcamento" required>
+      </div>
+
+      <div class="form-group">
+        <label for="valorOrcamento">Valor:</label>
+        <input type="number" id="valorOrcamento" name="valorOrcamento" step="0.01" required>
+      </div>
+
+      <div class="form-group">
+        <label for="dataOrcamento">Data:</label>
+        <input type="date" id="dataOrcamento" name="dataOrcamento" required>
+      </div>
+
       <button type="submit">Cadastrar</button>
     </form>
   </div>
 </div>
+
+<script>
+  function adicionarPeca() {
+    const container = document.getElementById('pecasContainer');
+    const newPeca = document.createElement('div');
+    newPeca.classList.add('peca-item');
+    newPeca.innerHTML = `
+      <select name="pecaOrcamento[]" required>
+        <option value="">Selecione uma peça</option>
+      </select>
+      <input type="number" name="quantidadePeca[]" placeholder="Qtd" min="1" value="1" required>
+      <button type="button" class="btn-remove-peca" onclick="removePeca(this)">Remover</button>
+    `;
+    container.appendChild(newPeca);
+    
+    // Show remove button for the first item
+    const removeButtons = container.getElementsByClassName('btn-remove-peca');
+    if (removeButtons.length === 1) {
+      removeButtons[0].style.display = 'inline';
+    }
+  }
+
+  function removePeca(button) {
+    const pecaItem = button.parentElement;
+    pecaItem.remove();
+    
+    // Hide remove button if no more items
+    const container = document.getElementById('pecasContainer');
+    const removeButtons = container.getElementsByClassName('btn-remove-peca');
+    if (removeButtons.length === 0) {
+      button.style.display = 'none';
+    }
+  }
+</script>
