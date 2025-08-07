@@ -15,8 +15,7 @@
         <div id="header"></div>
         <main class="main-content">
             <div class="top-actions">
-                <button id="btnAbrirModalPeca" onclick="abrirModal('modalCadastroPeca')"
-                    style="display:none;">Nova
+                <button id="btnAbrirModalPeca" onclick="abrirModal('modalCadastroPeca')" style="display:none;">Nova
                     Peça</button>
                 <button id="btnAbrirModalCarro" onclick="abrirModal('modalCadastroCarro')" style="display:none;">Novo
                     Carro</button>
@@ -109,10 +108,17 @@
             });
 
             import("../scripts/clients.js").then(module => {
-                const clientInstance = new module.default(); 
+                const clientInstance = new module.default();
                 clientInstance.createClients();
                 clientInstance.getClients();
                 clientInstance.deleteClients();
+            })
+
+            import("../scripts/orcamentos.js").then(module => {
+                const orcamentoInstance = new module.default();
+                // orcamentoInstance.createClients();
+                orcamentoInstance.getOrcamentos();
+                // orcamentoInstance.deleteClients();
             })
         })();
 

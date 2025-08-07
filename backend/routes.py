@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app
 from sqlalchemy import text
 from conn import db
+from datetime import datetime
 
 api_bp = Blueprint('api', __name__)
 
@@ -227,16 +228,212 @@ def get_clients():
         return jsonify({f"status": "sucess", "clients":  clientes})
     except:
         return jsonify({"status": "error", "message": "Erro ao buscar clientes"})
-    
-@api_bp.route("/delete-client/<int:id_client>", methods=["DELETE"]) 
+
+
+@api_bp.route("/delete-client/<int:id_client>", methods=["DELETE"])
 def delete_clients(id_client):
-    try: 
-        
+    try:
+
         sql = text("DELETE FROM clientes WHERE id = :id_client")
         db.session.execute(sql, {"id_client": id_client})
         db.session.commit()
-        
+
         return jsonify({"status": "sucess", "message": "Sucesso ao deletar cliente"})
     except Exception as e:
         print("Erro ao deletar cliente", e)
         return jsonify({"status": "error", "message": "Erro ao deletar cliente"})
+
+
+@api_bp.route("/create-orcamento", methods=["POST"])
+def create_orcamento():
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"status": "error", "message": "Dados não fornecidos"}), 400
+
+        cliente_id = data.get("cliente_id")
+        carro_id = data.get("carro_id")
+        servicos = data.get("servicos")
+        valor = data.get("valor")
+        data_orcamento = data.get("data_orcamento")
+        pecas = data.get("pecas")
+
+        # Validar campos obrigatórios
+        if not cliente_id:
+            return jsonify({"status": "error", "message": "Cliente ID é obrigatório"}), 400
+        if not carro_id:
+            return jsonify({"status": "error", "message": "Carro ID é obrigatório"}), 400
+        if not servicos:
+            return jsonify({"status": "error", "message": "Serviços são obrigatórios"}), 400
+        if not valor:
+            return jsonify({"status": "error", "message": "Valor é obrigatório"}), 400
+
+        # Tratar pecas - pode vir como string JSON ou lista
+        if pecas:
+            if isinstance(pecas, str):
+                try:
+                    import json
+                    pecas = json.loads(pecas)
+                except json.JSONDecodeError:
+                    return jsonify({"status": "error", "message": "Formato de peças inválido"}), 400
+            
+            if not isinstance(pecas, list):
+                return jsonify({"status": "error", "message": "Peças devem ser uma lista"}), 400
+
+        # Converter data_orcamento para formato YYYY-MM-DD
+        if data_orcamento:
+            try:
+                data_orcamento = datetime.strptime(
+                    data_orcamento, "%d/%m/%Y").strftime("%Y-%m-%d")
+            except ValueError:
+                return jsonify({"status": "error", "message": "Formato de data inválido. Use DD/MM/YYYY."}), 400
+
+        # 1. Inserir orçamento
+        sql = text(
+            "INSERT INTO orcamentos (cliente_id, carro_id, servicos, valor, data_orcamento) VALUES (:cliente_id, :carro_id, :servicos, :valor, :data_orcamento)"
+        )
+        db.session.execute(sql, {
+            "cliente_id": cliente_id,
+            "carro_id": carro_id,
+            "servicos": servicos,
+            "valor": valor,
+            "data_orcamento": data_orcamento
+        })
+        db.session.commit()
+
+        # 2. Recuperar o id do orçamento recém-criado
+        orcamento_id = db.session.execute(
+            text("SELECT LAST_INSERT_ID()")).scalar()
+
+        # 3. Inserir peças do orçamento (se houver)
+        if pecas:
+            for peca in pecas:
+                if not isinstance(peca, dict):
+                    continue
+                    
+                sql_peca = text(
+                    "INSERT INTO orcamento_pecas (orcamento_id, peca_id, quantidade) VALUES (:orcamento_id, :peca_id, :quantidade)"
+                )
+                db.session.execute(sql_peca, {
+                    "orcamento_id": orcamento_id,
+                    "peca_id": peca.get("peca_id"),
+                    "quantidade": peca.get("quantidade", 1)
+                })
+            db.session.commit()
+
+        # 4. Buscar dados completos do orçamento criado
+        sql_orcamento = text("""
+            SELECT o.id, o.servicos, o.valor, o.data_orcamento,
+                   c.nome as cliente_nome, 
+                   ca.modelo as carro_modelo, 
+                   ca.placa as carro_placa
+            FROM orcamentos o
+            JOIN clientes c ON o.cliente_id = c.id
+            JOIN carros ca ON o.carro_id = ca.id
+            WHERE o.id = :orcamento_id
+        """)
+        orcamento_result = db.session.execute(
+            sql_orcamento, {"orcamento_id": orcamento_id})
+        orcamento_row = orcamento_result.fetchone()
+
+        # 5. Buscar peças do orçamento
+        sql_pecas = text("""
+            SELECT op.peca_id, op.quantidade, p.nome, p.categoria, p.preco
+            FROM orcamento_pecas op
+            JOIN pecas p ON op.peca_id = p.id
+            WHERE op.orcamento_id = :orcamento_id
+        """)
+        pecas_result = db.session.execute(
+            sql_pecas, {"orcamento_id": orcamento_id})
+        pecas_data = [
+            {
+                "peca_id": peca_row.peca_id,
+                "nome": peca_row.nome,
+                "categoria": peca_row.categoria,
+                "preco": peca_row.preco,
+                "quantidade": peca_row.quantidade
+            }
+            for peca_row in pecas_result
+        ]
+
+        orcamento_criado = {
+            "id": orcamento_row.id,
+            "cliente_nome": orcamento_row.cliente_nome,
+            "carro_modelo": orcamento_row.carro_modelo,
+            "carro_placa": orcamento_row.carro_placa,
+            "servicos": orcamento_row.servicos,
+            "valor": orcamento_row.valor,
+            "data_orcamento": orcamento_row.data_orcamento,
+            "pecas": pecas_data
+        }
+
+        return jsonify({"status": "sucess", "message": "Sucesso ao criar orçamentos", "orcamento": orcamento_criado})
+    except Exception as e:
+        db.session.rollback()
+        print("Erro ao criar orçamento:", e)
+        return jsonify({"status": "error", "message": "Erro ao criar orçamentos"})
+
+
+@api_bp.route("/orcamentos", methods=["GET"])
+def get_orcamentos():
+    try:
+        sql = text("""
+            SELECT o.id, o.servicos, o.valor, o.data_orcamento,
+                   c.nome as cliente_nome, 
+                   ca.modelo as carro_modelo, 
+                   ca.placa as carro_placa
+            FROM orcamentos o
+            JOIN clientes c ON o.cliente_id = c.id
+            JOIN carros ca ON o.carro_id = ca.id
+        """)
+        result = db.session.execute(sql)
+
+        orcamentos = []
+        for row in result:
+            # Buscar peças usadas no orçamento
+            sql_pecas = text("""
+                SELECT op.peca_id, op.quantidade, p.nome, p.categoria, p.preco
+                FROM orcamento_pecas op
+                JOIN pecas p ON op.peca_id = p.id
+                WHERE op.orcamento_id = :orcamento_id
+            """)
+            pecas_result = db.session.execute(
+                sql_pecas, {"orcamento_id": row.id})
+            pecas = [
+                {
+                    "peca_id": peca_row.peca_id,
+                    "nome": peca_row.nome,
+                    "categoria": peca_row.categoria,
+                    "preco": peca_row.preco,
+                    "quantidade": peca_row.quantidade
+                }
+                for peca_row in pecas_result
+            ]
+
+            orcamentos.append({
+                "id": row.id,
+                "cliente_nome": row.cliente_nome,
+                "carro_modelo": row.carro_modelo,
+                "carro_placa": row.carro_placa,
+                "servicos": row.servicos,
+                "valor": row.valor,
+                "data_orcamento": row.data_orcamento,
+                "pecas": pecas
+            })
+        return jsonify({"status": "Sucess", "orcamentos": orcamentos})
+    except:
+        return jsonify({"status": "error", "message": "Erro ao buscar orçamentos"})
+
+
+@api_bp.route("/delete-orcamento/<int:id_orcamento>", methods=["DELETE"])
+def delete_orcamento(id_orcamento):
+    try:
+
+        sql = text("DELETE FROM orcamentos WHERE id = :id_orcamento")
+        db.session.execute(sql, {"id_orcamento": id_orcamento})
+        db.session.commit()
+
+        return jsonify({"status": "sucess", "message": "Sucesso ao deletar orçamento"})
+    except:
+        return jsonify({"status": "error", "message": "Erro ao deletar orçamento"})
